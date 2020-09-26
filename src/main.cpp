@@ -4,7 +4,6 @@
 #include <arm_math.h>
 #include <algorithm>    // std::sort
 #include <Visualization.h>
-#include <Streak.h>
 #include <Sparkle.h>
 #include <Spectrum2.h>
 
@@ -44,10 +43,6 @@ uint_fast8_t currentBrightness = brightness;
 // LED display array
 CRGB leds[numLEDs];
 
-// streaks array
-const uint_fast8_t numStreaks = 0;
-Streak * streaks[numStreaks];
-
 // random sparkle object
 Sparkle * sparkle;
 
@@ -60,25 +55,7 @@ Spectrum2 * spectrum4;
 // FUNTION DEFINITIONS
 void clear();
 void setAll(CRGB color);
-uint_fast8_t calcHue(float r, float g, float b);
-void defaultAllHues();
-void changeAllHues(uint_fast8_t hue);
-void stealColorAnimation(uint_fast8_t hue);
 uint_fast16_t xy2Pos(uint_fast16_t x, uint_fast16_t y);
-void displayGauge(uint_fast16_t x, uint_fast16_t yTop, uint_fast16_t length, CHSV color, float value);
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-// RECEIVER
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-const uint_fast8_t receive_pin = 31;
-
-const byte colorReadMessage = 0;
-const byte colorClearMessage = 1;
-const byte brightnessUpMessage = 2;
-const byte brightnessDownMessage = 3;
-const byte densityUpMessage = 4;
-const byte densityDownMessage = 5;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // ACTIONS / CONTROLS
@@ -88,11 +65,7 @@ const byte densityDownMessage = 5;
 uint_fast32_t loops = 0;
 uint_fast32_t setupTime = 0;
 
-bool colorStolen = false;
-
 // FUNCTIONS
-void stealColor();
-void clearStolenColor();
 void increaseBrightness();
 void decreaseBrightness();
 void increaseDensity();
@@ -169,14 +142,6 @@ void setup() {
   FastLED.show();
   Serial.println("cleared");
 
-  for (uint_fast16_t i=0;i<numStreaks;i++) {
-    streaks[i] = new Streak(columns, rows, greenHue, saturation, leds);
-    streaks[i]->setRandomHue(true);
-    streaks[i]->setIntervalMinMax(9, 23);
-    streaks[i]->setLengthMinMax(13, 37);
-    streaks[i]->inititalize(millis());
-  }
-
   Serial.println("Streaks Setup");
 
   sparkle = new Sparkle(numLEDs, 0, 0, leds, 10000);
@@ -200,8 +165,10 @@ void setup() {
   spectrum4 = new Spectrum2(columns, rows, rows - 1, noteCount,
     pinkHue, saturation, true, leds);
 
-
-  defaultAllHues();
+  spectrum1->setDrift(1);
+  spectrum2->setDrift(1);
+  spectrum3->setDrift(1);
+  spectrum4->setDrift(1);
 
   Serial.println("setup complete");
   setupTime = millis();
@@ -271,21 +238,6 @@ void loop() {
 
 // ACTIONS
 
-void stealColor() {
-  uint_fast8_t hue = 0;  // Will need to figure this out later
-  Serial.print("hue: ");
-  Serial.println(hue);
-  stealColorAnimation(hue);
-  changeAllHues(hue);
-  colorStolen = true;
-}
-
-void clearStolenColor() {
-  Serial.println("Clear Color");
-  colorStolen = false;
-  defaultAllHues();
-}
-
 void increaseBrightness() {
   currentBrightness = min((currentBrightness + 16), (uint_fast8_t) 240);
   FastLED.setBrightness(currentBrightness);
@@ -322,81 +274,6 @@ void clear() {
   setAll(off);
 }
 
-void changeAllHues(uint_fast8_t hue) {
-  for (uint_fast16_t i=0;i<numStreaks;i++) {
-    streaks[i]->setRandomHue(false);
-    streaks[i]->setHue(hue);
-  }
-
-  spectrum1->setHue(hue);
-  spectrum2->setHue(hue);
-  spectrum3->setHue(hue);
-  spectrum4->setHue(hue);
-
-  spectrum1->setDrift(0);
-  spectrum2->setDrift(0);
-  spectrum3->setDrift(0);
-  spectrum4->setDrift(0);
-}
-
-void defaultAllHues() {
-  for (uint_fast16_t i=0;i<numStreaks;i++) {
-    streaks[i]->setRandomHue(true);
-  }
-
-  spectrum1->setDrift(1);
-  spectrum2->setDrift(1);
-  spectrum3->setDrift(1);
-  spectrum4->setDrift(1);
-}
-
-uint_fast8_t calcHue(float r, float g, float b) {
-  float minC, maxC, delta, hue;
-
-  minC = min(r, min(g, b));
-  maxC = max(r, max(g, b));
-  delta = maxC - minC;
-
-  if(r == maxC) {
-    hue = ( g - b ) / delta;
-  } else if (g == maxC) {
-    hue = 2 + (b - r) / delta;
-  } else {
-    hue = 4 + (r - g) / delta;
-  }
-
-  hue *= 60; // degrees
-  if( hue < 0 ) {
-    hue += 360;
-  }
-
-  return (uint_fast8_t)((hue/360) * 255);
-}
-
-void stealColorAnimation(uint_fast8_t hue) {
-  float z = 0;
-  CRGB color = CHSV(hue, saturation, 255);
-  setAll(off);
-
-  FastLED.setBrightness(64);
-
-  uint_fast8_t delayMS = 30;
-
-  for (uint_fast16_t y=1; y<rows/2; y++) {
-    for (uint_fast8_t x=0; x<columns; x++) {
-      leds[xy2Pos(x, (rows/2) + y)] = color;
-      leds[xy2Pos(x, (rows/2) - y)] = color;
-    }
-    FastLED.show();
-    delay(delayMS);
-    delayMS = max(delayMS * 0.99, 1);
-  }
-
-  // Serial.println("StealColorAnimation Complete.");
-  FastLED.setBrightness(currentBrightness);
-}
-
-
 uint_fast16_t xy2Pos(uint_fast16_t x, uint_fast16_t y) {
   uint_fast16_t pos = x * rows;
   pos = pos + y;
@@ -409,15 +286,6 @@ uint_fast16_t xy2Pos(uint_fast16_t x, uint_fast16_t y) {
 
   return pos;
 }
-
-void displayGauge(uint_fast16_t x, uint_fast16_t yTop, uint_fast16_t length, CHSV color, float value) {
-  for (uint_fast16_t i = 0; i < length; i++) {
-    if (value >= (float)(length - i) / (float)length) {
-      leds[xy2Pos(x, yTop + i)] = color;
-    }
-  }
-}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // NOTE DETECTION
