@@ -48,9 +48,6 @@ Sparkle * sparkle;
 
 // 4 note visualization objects:
 Spectrum2 * spectrum1;
-Spectrum2 * spectrum2;
-Spectrum2 * spectrum3;
-Spectrum2 * spectrum4;
 
 // FUNTION DEFINITIONS
 void clear();
@@ -147,28 +144,10 @@ void setup() {
   sparkle = new Sparkle(numLEDs, 0, 0, leds, 10000);
   Serial.println("Sparkles!");
 
-  // spectrum1 = new Spectrum2(columns, rows, (rows / 4) - 1, noteCount,
-  //   pinkHue, saturation, true, leds);
-  // spectrum2 = new Spectrum2(columns, rows, (rows / 4), noteCount,
-  //   pinkHue, saturation, false, leds);
-  // spectrum3 = new Spectrum2(columns, rows, ((rows / 4) * 3) - 1 , noteCount,
-  //   pinkHue, saturation, true, leds);
-  // spectrum4 = new Spectrum2(columns, rows, (rows / 4) * 3, noteCount,
-  //   pinkHue, saturation, false, leds);
-
   spectrum1 = new Spectrum2(columns, rows, 0, noteCount,
     pinkHue, saturation, false, leds);
-  spectrum2 = new Spectrum2(columns, rows, (rows / 2) - 1, noteCount,
-    pinkHue, saturation, true, leds);
-  spectrum3 = new Spectrum2(columns, rows, (rows / 2), noteCount,
-    pinkHue, saturation, false, leds);
-  spectrum4 = new Spectrum2(columns, rows, rows - 1, noteCount,
-    pinkHue, saturation, true, leds);
 
   spectrum1->setDrift(1);
-  spectrum2->setDrift(1);
-  spectrum3->setDrift(1);
-  spectrum4->setDrift(1);
 
   Serial.println("setup complete");
   setupTime = millis();
@@ -216,9 +195,6 @@ void loop() {
   noteDetectionLoop();
 
   spectrum1->display(noteMagnatudes);
-  spectrum2->display(noteMagnatudes);
-  spectrum3->display(noteMagnatudes);
-  spectrum4->display(noteMagnatudes);
 
   // uint_least32_t loopThree = millis();
   // fftTime += loopThree - loopTwo;
@@ -251,17 +227,11 @@ void decreaseBrightness() {
 void increaseDensity() {
   float newDensity = min(0.8, spectrum1->getDensity() + 0.05);
   spectrum1->setDensity(newDensity);
-  spectrum2->setDensity(newDensity);
-  spectrum3->setDensity(newDensity);
-  spectrum4->setDensity(newDensity);
 }
 
 void decreaseDensity() {
   float newDensity = max(0.05, spectrum1->getDensity() - 0.05);
   spectrum1->setDensity(newDensity);
-  spectrum2->setDensity(newDensity);
-  spectrum3->setDensity(newDensity);
-  spectrum4->setDensity(newDensity);
 }
 
 void setAll(CRGB color) {
