@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include <FastLED.h>
-#include <Wire.h>
-#include <VirtualWire.h>
 #define ARM_MATH_CM4
 #include <arm_math.h>
 #include <algorithm>    // std::sort
@@ -145,11 +143,6 @@ void setup() {
 
   Serial.begin(9600);	// Debugging only
   Serial.println("setup");
-
-  // Initialise the IO and ISR
-  vw_set_rx_pin(receive_pin);
-  vw_setup(2000);	 // Bits per sec
-  vw_rx_start();       // Start the receiver PLL running
 
   randomSeed(analogRead(A4));
 
