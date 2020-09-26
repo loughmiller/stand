@@ -47,7 +47,7 @@ CRGB leds[numLEDs];
 Sparkle * sparkle;
 
 // 4 note visualization objects:
-Spectrum2 * spectrum1;
+Spectrum2 * spectrum;
 
 // FUNTION DEFINITIONS
 void clear();
@@ -144,10 +144,10 @@ void setup() {
   sparkle = new Sparkle(numLEDs, 0, 0, leds, 10000);
   Serial.println("Sparkles!");
 
-  spectrum1 = new Spectrum2(columns, rows, 0, noteCount,
+  spectrum = new Spectrum2(columns, rows, 0, noteCount,
     pinkHue, saturation, false, leds);
 
-  spectrum1->setDrift(1);
+  spectrum->setDrift(1);
 
   Serial.println("setup complete");
   setupTime = millis();
@@ -194,7 +194,7 @@ void loop() {
   ////////////////////////////////////////////////////////////////////////////////////////////////
   noteDetectionLoop();
 
-  spectrum1->display(noteMagnatudes);
+  spectrum->display(noteMagnatudes);
 
   // uint_least32_t loopThree = millis();
   // fftTime += loopThree - loopTwo;
@@ -225,13 +225,13 @@ void decreaseBrightness() {
 }
 
 void increaseDensity() {
-  float newDensity = min(0.8, spectrum1->getDensity() + 0.05);
-  spectrum1->setDensity(newDensity);
+  float newDensity = min(0.8, spectrum->getDensity() + 0.05);
+  spectrum->setDensity(newDensity);
 }
 
 void decreaseDensity() {
-  float newDensity = max(0.05, spectrum1->getDensity() - 0.05);
-  spectrum1->setDensity(newDensity);
+  float newDensity = max(0.05, spectrum->getDensity() - 0.05);
+  spectrum->setDensity(newDensity);
 }
 
 void setAll(CRGB color) {
