@@ -19,7 +19,6 @@ using namespace std;
 #define MIC_POWER 36
 #define MIC_GROUND 35
 
-#define BATTERY_PIN A5       // Input pin for reading battery level
 // WS2811_PORTDC: 2,14,7,8,6,20,21,5,15,22 - 10 way parallel
 
 
@@ -35,7 +34,6 @@ const uint_fast16_t numLEDs = rows * columns;
 // COLORS
 const uint_fast8_t saturation = 244;
 const uint_fast8_t brightness = 255;
-const uint_fast8_t lowBatteryBrightness = 64;
 
 const uint_fast8_t pinkHue = 240;
 const uint_fast8_t blueHue = 137;
@@ -70,30 +68,6 @@ void changeAllHues(uint_fast8_t hue);
 void stealColorAnimation(uint_fast8_t hue);
 uint_fast16_t xy2Pos(uint_fast16_t x, uint_fast16_t y);
 void displayGauge(uint_fast16_t x, uint_fast16_t yTop, uint_fast16_t length, CHSV color, float value);
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////
-// BATTERY
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-// CONSTANTS
-const uint_fast8_t numBatteries = 4;
-
-const float analogRatio = 310.3;
-const float batteryAlpha = 0.3;
-const float voltageDividerRatio = 0.096;
-const float batteryLoadAdjustment = 1.1;
-const uint_fast32_t maxBatteryReadInteral = 32000;
-uint_fast32_t batteryReadInterval = 5000;
-
-CHSV blueBatteryMeterColor(blueHue, saturation, 64);
-CHSV redBatteryMeeterColor(0, 255, 64);
-
-// STATE
-uint_fast16_t batteryReading = 435;  // start with the lowest 100% reading
-uint_fast32_t batteryTimestamp = 0;
-float batteryPercentage = 100;
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // RECEIVER
@@ -274,85 +248,6 @@ void loop() {
 //   // uint_fast32_t loopOne = millis();
 //   // rfTime += loopOne - loopZero;
 
-  // BATTERY READ
-  if (currentTime > batteryTimestamp + batteryReadInterval) {
-    batteryReadInterval = min(maxBatteryReadInteral, batteryReadInterval + 1000);
-    float currentReading = analogRead(BATTERY_PIN);
-
-    batteryReading = (uint_fast16_t)(((float)currentReading * batteryAlpha) + (1 - batteryAlpha) * (float)batteryReading);
-
-    // Battery Log:
-    // Timestamp  currentReading  batteryReading, divided voltage, batteryVoltage
-
-    batteryTimestamp = currentTime;
-    float dividedVoltage = (float)batteryReading / analogRatio;
-    float totalVoltage = dividedVoltage / voltageDividerRatio;
-    float batteryVoltage = (totalVoltage / numBatteries) * batteryLoadAdjustment;
-
-    // %   Voltage
-    // 100	4.1
-    // 95	  4.03
-    // 85	  3.98
-    // 75	  3.87
-    // 65 	3.8
-    // 55	  3.7
-    // 45	  3.6
-    // 35	  3.54
-    // 25	  3.48
-    // 15	  3.39
-    // 5	  3.2
-    // 0	  3
-
-    batteryPercentage = 0;
-    if (batteryVoltage > 3.1) { batteryPercentage = 0.1; }
-    if (batteryVoltage > 3.3) { batteryPercentage = 0.2; }
-    if (batteryVoltage > 3.4) { batteryPercentage = 0.3; }
-    if (batteryVoltage > 3.5) { batteryPercentage = 0.4; }
-    if (batteryVoltage > 3.6) { batteryPercentage = 0.5; }
-    if (batteryVoltage > 3.7) { batteryPercentage = 0.6; }
-    if (batteryVoltage > 3.8) { batteryPercentage = 0.7; }
-    if (batteryVoltage > 3.85) { batteryPercentage = 0.8; }
-    if (batteryVoltage > 3.95) { batteryPercentage = 0.9; }
-    if (batteryVoltage > 4.0) { batteryPercentage = 1; }
-
-    // Serial.print(currentTime);
-    // Serial.print("\t");
-    // Serial.print(currentReading);
-    // Serial.print("\t");
-    // Serial.print(batteryReading);
-    // Serial.print("\t");
-    // Serial.print(dividedVoltage);
-    // Serial.print("\t");
-    // Serial.print(batteryVoltage);
-    // Serial.print("\t");
-    // Serial.println(batteryPercentage);
-
-    // if (batteryVoltage < 2.8) {
-    //   Serial.println("");
-    //   Serial.println("Batteries are dead!");
-    //   clear();
-    //   FastLED.show();
-    //   exit(0);
-    // }
-  }
-
-//   // BATTERY GAUGE
-//   CHSV batteryMeterColor = blueBatteryMeterColor;
-
-//   if (batteryPercentage < 0.2) {
-//     batteryMeterColor = redBatteryMeeterColor;
-//   }
-
-//   if (batteryPercentage == 0) {
-//     displayGauge(1, 190, 10, batteryMeterColor, 1);   // display a full red gauge when we're near empty
-//     FastLED.setBrightness(lowBatteryBrightness);      // lower brightness to extend battery life
-//   } else {
-//     displayGauge(1, 190, 10, batteryMeterColor, batteryPercentage);
-//   }
-
-//   // uint_least32_t loopTwo = millis();
-//   // batteryTime += loopTwo - loopOne;
-
 //   // MAIN DISPLAY
 
   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,70 +267,9 @@ void loop() {
   // \ NOTE DETECTION
   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-//   for (uint_fast16_t i=0;i<numStreaks;i++) {
-//     streaks[i]->display(currentTime);
-//   }
-
   sparkle->display();
 
-  byte foo = (byte)analogRead(A13);
-
-  Serial.println(foo);
-
-  // if (vw_get_message(buf, &buflen)) {
-
-  //   // Serial.println(buf[0]);
-
-  //   if (buf[0] != messageID) {
-  //     messageID = buf[0];
-
-  //     // logging
-  //     Serial.print("Got: ");
-  //     for (uint_fast8_t i = 0; i < buflen; i++)
-  //     {
-  //       Serial.print(buf[i], HEX);
-  //       Serial.print(' ');
-  //     }
-  //     // Serial.println();
-
-  //     byte messageType = buf[1];
-  //     byte messageData = buf[2];
-
-  //     switch(messageType) {
-  //       case colorReadMessage:
-  //         stealColorAnimation(messageData);
-  //         changeAllHues(messageData);
-  //         Serial.println("Steal Color.");
-  //         break;
-  //       case colorClearMessage:
-  //         defaultAllHues();
-  //         Serial.println("Clear Color.");
-  //         break;
-  //       case brightnessUpMessage:
-  //         increaseBrightness();
-  //         Serial.println("Increase Brightness.");
-  //         break;
-  //       case brightnessDownMessage:
-  //         decreaseBrightness();
-  //         Serial.println("Decrease Brightness.");
-  //         break;
-  //       case densityUpMessage:
-  //         increaseDensity();
-  //         Serial.println("Increase Density.");
-  //         break;
-  //       case densityDownMessage:
-  //         decreaseDensity();
-  //         Serial.println("Decrease Density.");
-  //         break;
-  //     }
-
-  //     // Serial.println(loops/(millis() - startTime));
-  //   }
-  // }
-
   FastLED.show();
-
-
 
 //   // fastLEDTime += millis() - loopThree;
 }
