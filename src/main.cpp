@@ -133,7 +133,8 @@ void setup() {
   spectrum = new Spectrum2(columns, rows, 0, noteCount,
     pinkHue, saturation, false, leds);
 
-  spectrum->setDrift(1);
+  spectrum->setDrift(50);
+  spectrum->setDensity(.1);
 
   Serial.println("setup complete");
   setupTime = millis();
