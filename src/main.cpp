@@ -107,8 +107,6 @@ void setup() {
   // SETUP LEDS
   // Parallel  Pin layouts on the teensy 3/3.1:
   // // WS2811_PORTD: 2,14,7,8,6,20,21,5
-  // // WS2811_PORTC: 15,22,23,9,10,13,11,12,28,27,29,30 (these last 4 are pads on the bottom of the teensy)
-  // WS2811_PORTDC: 2,14,7,8,6,20,21,5,15,22,23,9,10,13,11,12 - 16 way parallel
 
   FastLED.addLeds<WS2811_PORTD,columns>(leds, rows);
   FastLED.setDither(1);
@@ -221,12 +219,6 @@ uint_fast16_t xy2Pos(uint_fast16_t x, uint_fast16_t y) {
   uint_fast16_t pos = x * rows;
   pos = pos + y;
 
-  // if (x % 2 == 0) {
-  //   pos = pos + y;
-  // } else {
-  //   pos = pos + ((rows - 1) - y);
-  // }
-
   return pos;
 }
 
@@ -272,8 +264,6 @@ void noteDetectionLoop() {
     if (note >= noteCount) {
       break;
     }
-
-    // note = note % noteCount;  // I'd like a side by side of this vs the above break
 
     // Multiple bins can point to the same note, use the largest magnitude
     noteMagnatudes[note] = max(noteMagnatudes[note], magnitudes[i]);
