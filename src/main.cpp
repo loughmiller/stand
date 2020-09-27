@@ -141,6 +141,7 @@ void setup() {
 }
 
 uint_fast32_t loggingTimestamp = 0;
+bool latch  = false;
 
 // LOOP
 void loop() {
@@ -158,43 +159,28 @@ void loop() {
 
     Serial.print("\tFrame Rate: ");
     Serial.print(loops / ((currentTime - setupTime) / 1000));
-//     // Serial.println();
-//     // Serial.print(rfTime/loops);
-//     // Serial.print("\t");
-//     // Serial.print(fftTime/loops);
-//     // Serial.print("\t");
-//     // Serial.print(batteryTime/loops);
-//     // Serial.print("\t");
-//     // Serial.print(fastLEDTime/loops);
+    Serial.print("\tmagnitude: ");
+    Serial.print(spectrum->getMagnitude());
     Serial.println("");
   }
 
-//   // uint_fast32_t loopZero = millis();
-
-//   // uint_fast32_t loopOne = millis();
-//   // rfTime += loopOne - loopZero;
-
-//   // MAIN DISPLAY
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  // NOTE DETECTION
-  ////////////////////////////////////////////////////////////////////////////////////////////////
+  // MAIN DISPLAY
   noteDetectionLoop();
 
   spectrum->display(noteMagnatudes);
-
-  // uint_least32_t loopThree = millis();
-  // fftTime += loopThree - loopTwo;
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  // \ NOTE DETECTION
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
   sparkle->display();
 
-  FastLED.show();
+  float magnitude = spectrum->getMagnitude();
 
-//   // fastLEDTime += millis() - loopThree;
+  if ((magnitude < 3500 && !latch) || (magnitude < 4200 && latch)) {
+    uint_fast8_t hue = (currentTime / 1000) % 256;
+    setAll(CHSV(hue, saturation, 96));
+    latch = true;
+  } else {
+    latch = false;
+  }
+
+  FastLED.show();
 }
 
 // /LOOP
