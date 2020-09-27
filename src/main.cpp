@@ -12,7 +12,7 @@ using namespace std;
 // // DEFINE PINS HERE
 #define AUDIO_INPUT_PIN A12  // (38) Input pin for audio data.
 
-// WS2811_PORTDC: 2,14,7,8,6,20,21,5,15,22 - 10 way parallel
+// WS2811_PORTD: 2,14,7,8,6,20,21,5 - 8 way parallel
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,13 +20,13 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // GEOMETRY CONSTANTS
-const uint_fast8_t rows = 200;
-const uint_fast8_t columns = 10;
+const uint_fast8_t rows = 36;
+const uint_fast8_t columns = 4;
 const uint_fast16_t numLEDs = rows * columns;
 
 // COLORS
 const uint_fast8_t saturation = 244;
-const uint_fast8_t brightness = 255;
+const uint_fast8_t brightness = 224;
 
 const uint_fast8_t pinkHue = 240;
 const uint_fast8_t blueHue = 137;
@@ -78,8 +78,8 @@ const float middleA{440.0};                     // frequency of middle A.  Neede
 const uint_fast16_t sampleIntervalMs{1000000 / (fftSize * fftBinSize)};  // how often to get a sample, needed for IntervalTimer
 
 // FREQUENCY TO NOTE CONSTANTS - CALCULATE HERE: https://docs.google.com/spreadsheets/d/1CPcxGFB7Lm6xJ8CePfCF0qXQEZuhQ-nI1TC4PAiAd80/edit?usp=sharing
-const uint_fast16_t noteCount{50};              // how many notes are we trying to detect
-const uint_fast16_t notesBelowMiddleA{33};
+const uint_fast16_t noteCount{rows};              // how many notes are we trying to detect
+const uint_fast16_t notesBelowMiddleA{20};
 
 // NOTE DETECTION GLOBALS
 float samples[sampleCount*2];
@@ -110,9 +110,9 @@ void setup() {
   // // WS2811_PORTC: 15,22,23,9,10,13,11,12,28,27,29,30 (these last 4 are pads on the bottom of the teensy)
   // WS2811_PORTDC: 2,14,7,8,6,20,21,5,15,22,23,9,10,13,11,12 - 16 way parallel
 
-  FastLED.addLeds<WS2811_PORTDC,columns>(leds, rows);
+  FastLED.addLeds<WS2811_PORTD,columns>(leds, rows);
   FastLED.setDither(1);
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 4000);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 2400);
   FastLED.setBrightness(currentBrightness);
 
   // INDICATE BOOT SEQUENCE
