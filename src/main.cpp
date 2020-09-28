@@ -98,6 +98,10 @@ void samplingCallback();
 
 void setup() {
   Serial.begin(9600);	// Debugging only
+
+  // wait 4 seconds for serial to come up, or bail
+  while(!Serial && millis()<4000);
+
   Serial.println("setup");
 
   randomSeed(analogRead(A4));
