@@ -129,7 +129,7 @@ void setup() {
 
   Serial.println("Streaks Setup");
 
-  sparkle = new Sparkle(numLEDs, 0, 0, leds, 10000);
+  sparkle = new Sparkle(numLEDs, 0, 0, leds, 1000);
   Serial.println("Sparkles!");
 
   spectrum = new Spectrum2(columns, rows, 0, noteCount,
