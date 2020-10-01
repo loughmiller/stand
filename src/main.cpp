@@ -169,7 +169,7 @@ void loop() {
   // MAIN DISPLAY
   noteDetectionLoop();
 
-  spectrum->display(noteMagnatudes);
+//  spectrum->display(noteMagnatudes);
   sparkle->display();
 
   float magnitude = spectrum->getMagnitude();
