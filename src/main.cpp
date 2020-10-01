@@ -174,7 +174,7 @@ void loop() {
 
   float magnitude = spectrum->getMagnitude();
 
-  if ((magnitude < 4000 && !latch) || (magnitude < 5000 && latch)) {
+  if ((magnitude < 8000 && !latch) || (magnitude < 10000 && latch)) {
     uint_fast8_t hue = (currentTime / 1000) % 256;
     setAll(CHSV(hue, saturation, 96));
 
@@ -186,7 +186,7 @@ void loop() {
     }
 
     for(uint_fast8_t j = 0; j < magH; j++) {
-      leds[xy2Pos(1, j)] = off;
+      leds[xy2Pos(2, j)] = off;
     }
 
     latch = true;
