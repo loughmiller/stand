@@ -99,8 +99,10 @@ void samplingCallback();
 void setup() {
   Serial.begin(9600);	// Debugging only
 
-  // wait 4 seconds for serial to come up, or bail
-  while(!Serial && millis()<4000);
+  // wait 10 seconds for serial to come up, or bail
+  // pio device monitor must be started in this 10 second window
+  // this is a raspberry pi thing
+  while(!Serial && millis() < 10000);
 
   Serial.println("setup");
 
