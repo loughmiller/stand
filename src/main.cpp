@@ -183,7 +183,7 @@ void loop() {
 
     latch = true;
   } else {
-    uint_fast8_t hue = (currentTime / 100) % 256;
+    uint_fast8_t hue = spectrum->getHue();
     color = CHSV(hue, saturation, 96);
     latch = false;
   }
