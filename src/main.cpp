@@ -174,9 +174,21 @@ void loop() {
 
   float magnitude = spectrum->getMagnitude();
 
-  if ((magnitude < 3500 && !latch) || (magnitude < 4200 && latch)) {
+  if ((magnitude < 4000 && !latch) || (magnitude < 5000 && latch)) {
     uint_fast8_t hue = (currentTime / 1000) % 256;
     setAll(CHSV(hue, saturation, 96));
+
+    uint_fast8_t magT = floor((int)magnitude/1000);
+    uint_fast8_t magH = floor(((int)magnitude % 1000)/100);
+
+    for(uint_fast8_t i = 0; i < magT; i++) {
+      leds[xy2Pos(0, i)] = off;
+    }
+
+    for(uint_fast8_t j = 0; j < magH; j++) {
+      leds[xy2Pos(1, j)] = off;
+    }
+
     latch = true;
   } else {
     latch = false;
