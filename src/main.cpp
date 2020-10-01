@@ -174,7 +174,7 @@ void loop() {
 
   float magnitude = spectrum->getMagnitude();
 
-  if ((magnitude < 8000 && !latch) || (magnitude < 10000 && latch)) {
+  if ((magnitude < 3700 && !latch) || (magnitude < 5500 && latch)) {
     uint_fast8_t hue = (currentTime / 1000) % 256;
     setAll(CHSV(hue, saturation, 96));
 
