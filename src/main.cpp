@@ -174,14 +174,17 @@ void loop() {
 
   float magnitude = spectrum->getMagnitude();
 
-  uint_fast8_t hue = (currentTime / 1000) % 256;
-  CRGB color = CHSV(hue, saturation, 96);
+  CRGB color;
 
   if ((magnitude < 3300 && !latch) || (magnitude < 5300 && latch)) {
+    uint_fast8_t hue = (currentTime / 1000) % 256;
+    color = CHSV(hue, saturation, 96);
     setAll(color);
 
     latch = true;
   } else {
+    uint_fast8_t hue = (currentTime / 100) % 256;
+    color = CHSV(hue, saturation, 96);
     latch = false;
   }
 
