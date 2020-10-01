@@ -16,5 +16,5 @@ Run:
 ```
 git submodule update --init --recursive
 
-pio run --target upload
+~/.platformio/penv/bin/pio run --target upload
 ```
