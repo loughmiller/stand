@@ -174,9 +174,11 @@ void loop() {
 
   float magnitude = spectrum->getMagnitude();
 
+  uint_fast8_t hue = (currentTime / 1000) % 256;
+  CRGB color = CHSV(hue, saturation, 96);
+
   if ((magnitude < 3300 && !latch) || (magnitude < 5300 && latch)) {
-    uint_fast8_t hue = (currentTime / 1000) % 256;
-    setAll(CHSV(hue, saturation, 96));
+    setAll(color);
 
     latch = true;
   } else {
@@ -189,8 +191,12 @@ void loop() {
 
   uint_fast8_t level = 33 * gauge;
 
+  for(uint_fast8_t i = 0; i < 33; i++) {
+    leds[xy2Pos(2, i)] = off;
+  }
+
   for(uint_fast8_t i = 0; i < level; i++) {
-    leds[xy2Pos(3, i)] = off;
+    leds[xy2Pos(2, i)] = color;
   }
 
   FastLED.show();
