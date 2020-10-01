@@ -129,7 +129,7 @@ void setup() {
 
   Serial.println("Streaks Setup");
 
-  sparkle = new Sparkle(numLEDs, 0, 0, leds, 1000);
+  sparkle = new Sparkle(numLEDs, 0, 0, leds, 3000);
   Serial.println("Sparkles!");
 
   spectrum = new Spectrum2(columns, rows, 0, noteCount,
@@ -169,7 +169,7 @@ void loop() {
   // MAIN DISPLAY
   noteDetectionLoop();
 
-//  spectrum->display(noteMagnatudes);
+  spectrum->display(noteMagnatudes);
   sparkle->display();
 
   float magnitude = spectrum->getMagnitude();
