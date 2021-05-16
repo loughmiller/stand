@@ -20,7 +20,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // GEOMETRY CONSTANTS
-const uint_fast8_t rows = 36;
+const uint_fast8_t rows = 100;
 const uint_fast8_t columns = 4;
 const uint_fast16_t numLEDs = rows * columns;
 
@@ -43,7 +43,8 @@ CRGB leds[numLEDs];
 Sparkle * sparkle;
 
 // 4 note visualization objects:
-Spectrum2 * spectrum;
+Spectrum2 * spectrum1;
+Spectrum2 * spectrum2;
 
 // FUNTION DEFINITIONS
 void clear();
@@ -78,8 +79,8 @@ const float middleA{440.0};                     // frequency of middle A.  Neede
 const uint_fast16_t sampleIntervalMs{1000000 / (fftSize * fftBinSize)};  // how often to get a sample, needed for IntervalTimer
 
 // FREQUENCY TO NOTE CONSTANTS - CALCULATE HERE: https://docs.google.com/spreadsheets/d/1CPcxGFB7Lm6xJ8CePfCF0qXQEZuhQ-nI1TC4PAiAd80/edit?usp=sharing
-const uint_fast16_t noteCount{rows};              // how many notes are we trying to detect
-const uint_fast16_t notesBelowMiddleA{20};
+const uint_fast16_t noteCount{50};              // how many notes are we trying to detect
+const uint_fast16_t notesBelowMiddleA{33};
 
 // NOTE DETECTION GLOBALS
 float samples[sampleCount*2];
@@ -134,11 +135,15 @@ void setup() {
   sparkle = new Sparkle(numLEDs, 0, 0, leds, 3000);
   Serial.println("Sparkles!");
 
-  spectrum = new Spectrum2(columns, rows, 0, noteCount,
+  spectrum1 = new Spectrum2(columns, rows, 0, noteCount,
     pinkHue, saturation, false, leds);
+  spectrum2 = new Spectrum2(columns, rows, (rows) - 1, noteCount,
+    pinkHue, saturation, true, leds);
 
-  spectrum->setDrift(50);
-  spectrum->setDensity(.1);
+  spectrum1->setDrift(50);
+  spectrum1->setDensity(.1);
+  spectrum2->setDrift(50);
+  spectrum2->setDensity(.1);
 
   Serial.println("setup complete");
   setupTime = millis();
@@ -164,45 +169,46 @@ void loop() {
     Serial.print("\tFrame Rate: ");
     Serial.print(loops / ((currentTime - setupTime) / 1000));
     Serial.print("\tmagnitude: ");
-    Serial.print(spectrum->getMagnitude());
+    // Serial.print(spectrum->getMagnitude());
     Serial.println("");
   }
 
   // MAIN DISPLAY
   noteDetectionLoop();
 
-  spectrum->display(noteMagnatudes);
+  spectrum1->display(noteMagnatudes);
+  spectrum2->display(noteMagnatudes);
   sparkle->display();
 
-  float magnitude = spectrum->getMagnitude();
+  // float magnitude = spectrum1->getMagnitude();
 
-  CRGB color;
+  // CRGB color;
 
-  if ((magnitude <= 3300 && !latch) || (magnitude < 5300 && latch)) {
-    uint_fast8_t hue = (currentTime / 1000) % 256;
-    color = CHSV(hue, saturation, 96);
-    setAll(color);
+  // if ((magnitude <= 3300 && !latch) || (magnitude < 5300 && latch)) {
+  //   uint_fast8_t hue = (currentTime / 1000) % 256;
+  //   color = CHSV(hue, saturation, 96);
+  //   setAll(color);
 
-    latch = true;
-  } else {
-    uint_fast8_t hue = spectrum->getHue();
-    color = CHSV(hue, saturation, 96);
-    latch = false;
-  }
+  //   latch = true;
+  // } else {
+  //   uint_fast8_t hue = spectrum->getHue();
+  //   color = CHSV(hue, saturation, 96);
+  //   latch = false;
+  // }
 
-  float gauge = ((magnitude - 3300.0) / 2000.0);
-  gauge = min(1, gauge);
-  gauge = max(0, gauge);
+  // float gauge = ((magnitude - 3300.0) / 2000.0);
+  // gauge = min(1, gauge);
+  // gauge = max(0, gauge);
 
-  uint_fast8_t level = 33 * gauge;
+  // uint_fast8_t level = 33 * gauge;
 
-  for(uint_fast8_t i = 0; i < 33; i++) {
-    leds[xy2Pos(2, i)] = off;
-  }
+  // for(uint_fast8_t i = 0; i < 33; i++) {
+  //   leds[xy2Pos(2, i)] = off;
+  // }
 
-  for(uint_fast8_t i = 0; i < level; i++) {
-    leds[xy2Pos(2, i)] = color;
-  }
+  // for(uint_fast8_t i = 0; i < level; i++) {
+  //   leds[xy2Pos(2, i)] = color;
+  // }
 
   FastLED.show();
 }
@@ -222,13 +228,13 @@ void decreaseBrightness() {
 }
 
 void increaseDensity() {
-  float newDensity = min(0.8, spectrum->getDensity() + 0.05);
-  spectrum->setDensity(newDensity);
+  float newDensity = min(0.8, spectrum1->getDensity() + 0.05);
+  spectrum1->setDensity(newDensity);
 }
 
 void decreaseDensity() {
-  float newDensity = max(0.05, spectrum->getDensity() - 0.05);
-  spectrum->setDensity(newDensity);
+  float newDensity = max(0.05, spectrum1->getDensity() - 0.05);
+  spectrum1->setDensity(newDensity);
 }
 
 void setAll(CRGB color) {
