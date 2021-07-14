@@ -21,7 +21,7 @@ using namespace std;
 
 // GEOMETRY CONSTANTS
 const uint_fast8_t rows = 100;
-const uint_fast8_t columns = 4;
+const uint_fast8_t columns = 8;
 const uint_fast16_t numLEDs = rows * columns;
 
 // COLORS
@@ -141,9 +141,7 @@ void setup() {
     pinkHue, saturation, true, leds);
 
   spectrum1->setDrift(50);
-  spectrum1->setDensity(.1);
   spectrum2->setDrift(50);
-  spectrum2->setDensity(.1);
 
   Serial.println("setup complete");
   setupTime = millis();
