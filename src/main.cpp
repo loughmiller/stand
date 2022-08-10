@@ -21,7 +21,7 @@ using namespace std;
 
 // GEOMETRY CONSTANTS
 const uint_fast8_t rows = 100;
-const uint_fast8_t columns = 8;
+const uint_fast8_t columns = 1;
 const uint_fast16_t numLEDs = rows * columns;
 
 // COLORS
@@ -85,7 +85,6 @@ void setup() {
 }
 
 uint_fast32_t loggingTimestamp = 0;
-bool latch  = false;
 
 // LOOP
 void loop() {
@@ -107,8 +106,10 @@ void loop() {
   }
 
   // MAIN DISPLAY
+  setAll(0x000040);
 
-  setAll(0x001000);
+  // uint_fast16_t i = (loops/10) % numLEDs;
+  // leds[i] = 0x0000FF;
 
   FastLED.show();
 }
